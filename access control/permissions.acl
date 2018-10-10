@@ -12,6 +12,31 @@
  * limitations under the License.
  */
 
+rule UserCanNotManageParticipants {
+    description: "Members of the User roles can not manage participants"
+    participant: "org.bicyclesharing.model.User"
+    operation: CREATE, UPDATE, DELETE
+    resource: "org.bicyclesharing.model.Actor"
+    action: DENY
+}
+
+rule UserCanCreateHireableAsset {
+    description: "Members of the User roles can not create hireable assets"
+    participant: "org.bicyclesharing.model.User"
+    operation: CREATE
+    resource: "org.bicyclesharing.model.HireableAsset"
+    action: DENY
+}
+
+rule AssetOwnerCanNotManageParticipants {
+    description: "Members of the AssetOwner roles can not manage participants"
+    participant: "org.bicyclesharing.model.AssetOwner"
+    operation: CREATE, UPDATE, DELETE
+    resource: "org.bicyclesharing.model.Actor"
+    action: DENY
+}
+
+
 rule NetworkAdminUser {
     description: "Grant business network administrators full access to user resources"
     participant: "**"
@@ -19,6 +44,5 @@ rule NetworkAdminUser {
     resource: "**"
     action: ALLOW
 }
-
 
 
