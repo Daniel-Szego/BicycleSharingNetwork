@@ -12,84 +12,139 @@
  * limitations under the License.
  */
 
-/**
- * Simple decentralized exchange protocol
+namespace org.bicyclesharing.model
+
+/*
+ *  ENUMS
  */
 
-namespace org.simpledex
+enum AvailabilityEnum {
+	o 	FREE
+    o 	NOT_AVAILABLE
+    o 	HIRED
+}
 
-/**
- * ASSETS
+enum StateEnum {
+	o 	GOOD
+    o 	IMPAIRED
+    o	FAULTY
+}
+
+enum ColorEnum {
+	o WHITE
+    o BLACK
+    o BLUE
+    o GREEN 
+    o GREY
+    o RED
+}
+
+enum BikeEnum {
+	o SPORT
+    o CHOPPER
+    o SCOOTER
+}
+
+/*
+ *  CONCEPTS
  */
 
-enum OrderStatus {
-  o INITIATED
-  o OFFERED
-  o CLOSED
+concept Wheel {
+	o Integer Size optional 
+    o String TireType optional 
 }
 
-abstract asset AssetAncestor identified by assetId {
-  o String assetId
+concept Engine {
+	o String EngineType
+    o String EngineDescription
 }
 
-abstract asset OrderAncestor identified by orderId {
-  o String orderId
-  o Double amount
-  o String assetType
-  o Boolean buyOrSell 
-  o OrderStatus orderStatus
+concept Address {
+	o String Country
+    o String City
+    o String Street
+    o Integer HauseNumber
 }
 
-asset Order extends OrderAncestor { 
-}
-
-/**
- * PARTICIPANTS
+/*
+ *  ASSETS
  */
 
-abstract participant DEXAncestor identified by dexId {
-  o String dexId
-  --> Order[] orders
+abstract asset HireableAsset identified by ObjectID {
+	o String ObjectID
+    o String ObjectName
+    o AvailabilityEnum AssetAvailability default = "FREE"
+    o StateEnum AssetSate default = "GOOD"
+  	--> AssetOwner Owner optional
+	--> User HiredBy optional  
+}
+  
+asset Bycicle extends HireableAsset{
+  	o Wheel BicycleWheel optional
+  	o ColorEnum BicycleColor default = "RED" optional	
 }
 
-participant DEX extends DEXAncestor {
+asset Bike extends HireableAsset{
+  	o BikeEnum BikeType optional
+  	o ColorEnum BicycleColor default = "RED" optional	
 }
 
-/**
- * TRANSACTIONS
+
+/*
+ *  PARTICIPANTS
  */
 
-transaction CreateDEX {  
+abstract participant Actor identified by ActorID{
+	o String ActorID
+  	o Integer AccountBalance
 }
+  
+participant User extends Actor {
+	o String UserName 
+  	o Address UserAddress optional
+}
+  
+participant AssetOwner extends Actor {
+	o String OwnerName
+  	o Address OwnerAddress optional
+}
+  
+  
+/*
+ *  TRANSACTIONS
+ */
+  
+transaction InitTestData {
+}  
 
 transaction ClearData {
+}  
+  
+transaction HireBycicle {
+	--> Bycicle BycicleToHire
+    --> User HireByMe
 }
 
-transaction CreateAndPlaceOrder {
-    --> DEX dex 
-    o Double amount
-    o String assetType
-    o Boolean buyOrSell
+transaction NeedRepair {
+	--> Bycicle BycicleToRepair
 }
 
-transaction PlaceOrder {
-  --> Order order
-  --> DEX dex 
+transaction Repaired {
+	--> Bycicle BycicleToRepair
 }
 
-/**
- * EVENTS
+
+/*
+ *  EVENTS
  */
 
-event OrderPlacedEvent {
-  --> Order order
-  --> DEX dex
+ event BycicleHiredEvent {
+	o String BycicleName
+    o String HiringPersonName
 }
 
-event MatchingEvent {
-  --> Order[] orders
-  --> DEX dex
-}
+
+
 
 
 
